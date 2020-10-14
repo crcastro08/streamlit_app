@@ -1,22 +1,27 @@
+# base image
 FROM python:3.7
 
-#COPY requirements.txt ./requirements.txt
-#RUN pip3 install -r requirements.txt
-# Install production dependencies.
-RUN pip install pandas
-RUN pip install streamlit
+# streamlit-specific commands
+RUN mkdir -p /root/.streamlit
+RUN bash -c 'echo -e "\
+[general]\n\
+email = \"\"\n\
+" > /root/.streamlit/credentials.toml'
+RUN bash -c 'echo -e "\
+[server]\n\
+enableCORS = false\n\
+" > /root/.streamlit/config.toml'
 
-# Copy local code to the container image.
-#WORKDIR /app
-#COPY . .
-COPY . /app
-WORKDIR /app
-# Service must listen to $PORT environment variable.
-# This default value facilitates local development.
-#ENV PORT 8080
-
+# exposing default port for streamlit
 EXPOSE 8080
-ENTRYPOINT ["streamlit","run"]
-CMD ["app.py"]
-#COPY . /app
+
+# copy over and install packages
+COPY requirements.txt ./requirements.txt
+RUN pip3 install -r requirements.txt
+
+# copying everything over
+COPY . .
+
+# run app
+CMD streamlit run webapp/app.py
 #CMD streamlit run --server.port 8080 --server.enableCORS false app.py
