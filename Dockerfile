@@ -7,13 +7,16 @@ RUN pip install pandas
 RUN pip install streamlit
 
 # Copy local code to the container image.
+#WORKDIR /app
+#COPY . .
+COPY . /app
 WORKDIR /app
-COPY . .
-
 # Service must listen to $PORT environment variable.
 # This default value facilitates local development.
 #ENV PORT 8080
 
 EXPOSE 8080
+ENTRYPOINT ["streamlit","run"]
+CMD ["app.py"]
 #COPY . /app
-CMD streamlit run --server.port 8080 --server.enableCORS false app.py
+#CMD streamlit run --server.port 8080 --server.enableCORS false app.py
